@@ -275,9 +275,7 @@
 
         // Formatierfunktion für Zahlen
         function formatNumber(amount) {
-            return amount.toLocaleString('de-DE', {
-                style: 'currency',
-                currency: 'EUR',
+            return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');      
             });
         }
 
