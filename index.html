@@ -18,6 +18,19 @@
         .config-panel { display: none; margin-top: 20px; }
         .config-input { width: 80%; margin: 5px; padding: 5px; }
         #totalAmount { font-weight: bold; color: green; margin-top: 10px; }
+
+        /* Tabellenaussehen */
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd; /* Strich zwischen den Konten */
+            text-align: left;
+        }
+
+        .balance-item:last-child {
+            border-bottom: none; /* Kein Strich am Ende der Liste */
+        }
     </style>
 </head>
 <body>
@@ -29,7 +42,7 @@
         <button onclick="executeCommand()">Ausführen</button>
         <p id="output"></p>
         <h2>Kontostände</h2>
-        <ul id="balanceList"></ul>
+        <div id="balanceList"></div> <!-- Hier wird die Liste angezeigt -->
         <div id="totalAmount"></div>
 
         <div class="config-panel" id="configPanel">
@@ -178,9 +191,10 @@
 
             // Füge die sortierten Einträge der Liste hinzu
             balanceArray.forEach(([user, amount]) => {
-                const li = document.createElement("li");
-                li.innerText = `${user}: ${formatNumber(amount)}`;  // Formatierung des Betrags
-                balanceList.appendChild(li);
+                const div = document.createElement("div");
+                div.classList.add("balance-item");  // fügt die Formatierung hinzu
+                div.innerHTML = `<span>${user}</span><span>${formatNumber(amount)}</span>`;
+                balanceList.appendChild(div);
             });
         }
 
