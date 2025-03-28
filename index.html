@@ -275,7 +275,7 @@
 
         // Formatierfunktion für Zahlen
         function formatNumber(amount) {
-            return amount.toFixed(2).replace('.', ',');        
+            return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');      
         }
 
         loadConfig();
