@@ -213,7 +213,7 @@
 
         function formatNumber(amount) {
             // Formatiert den Betrag und stellt sicher, dass das Euro-Zeichen nur einmal angezeigt wird.
-            return amount.toFixed(2).replace('.', ',') + '€';  // z.B. 1,00€
+            return amount.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
         }
 
         // Beim Laden der Seite Konfiguration laden
