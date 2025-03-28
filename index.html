@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auszahlungssystem</title>
+    <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
@@ -43,6 +44,7 @@
     </div>
 
     <script>
+        // Firebase Konfiguration - ERSETZE DIESE DURCH DEINE EIGENE!
         const firebaseConfig = {
             apiKey: "AIzaSyAUdrM76myBvPEyE-n-qjhoxr1DIA9PVPw",
             authDomain: "auszahlung-9d1b6.firebaseapp.com",  
@@ -54,12 +56,14 @@
             measurementId: "G-CG3LST4JWG"
         };
 
+        // Firebase initialisieren
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         let balance = {};
         let commandHistory = [];
 
+        // Speichere Daten in Firebase
         function saveConfig() {
             database.ref('payoutSystem').set({
                 balance: balance,
@@ -68,6 +72,7 @@
             });
         }
 
+        // Lade Daten von Firebase
         function loadConfig() {
             database.ref('payoutSystem').once('value').then((snapshot) => {
                 const data = snapshot.val();
@@ -84,15 +89,17 @@
                 }
             });
 
+            // Echtzeit-Listener für Änderungen
             database.ref('payoutSystem/balance').on('value', (snapshot) => {
                 balance = snapshot.val() || {};
                 updateBalanceList();
             });
         }
 
+        // Funktionen zur Interaktion
         function toggleDarkMode() {
             document.body.classList.toggle("dark-mode");
-            saveConfig();
+            saveConfig();  // Optional: Speichern des Dark Mode Status
         }
 
         function toggleConfigPanel() {
@@ -119,7 +126,7 @@
             if (cmd === "/bonus" && amount !== null) {
                 if (!balance[user]) balance[user] = 0;
                 balance[user] += amount;
-                outputMessage = `${amount}€ zu ${user} hinzugefügt. Neuer Kontostand: ${formatNumber(balance[user])}`;
+                outputMessage = `${amount}€ zu ${user} hinzugefügt. Neuer Kontostand: ${formatNumber(balance[user])}€`;
             } else if (cmd === "/remove") {
                 if (user === "*") {
                     balance = {};
@@ -129,7 +136,7 @@
                         outputMessage = `${user} hat nicht genug Guthaben.`;
                     } else {
                         balance[user] -= amount;
-                        outputMessage = `${amount}€ von ${user} entfernt. Neuer Kontostand: ${formatNumber(balance[user])}`;
+                        outputMessage = `${amount}€ von ${user} entfernt. Neuer Kontostand: ${formatNumber(balance[user])}€`;
                     }
                 } else {
                     outputMessage = "Ungültiger Befehl! Nutze: /remove (Benutzer) (Betrag) oder /remove *";
@@ -158,14 +165,23 @@
             document.getElementById("output").innerText = outputMessage;
         }
 
+        // Hilfsfunktionen
         function updateBalanceList() {
             const balanceList = document.getElementById("balanceList");
             balanceList.innerHTML = "";
-            for (const user in balance) {
+
+            // Konvertiere das Balance-Objekt in ein Array von [Benutzername, Betrag]-Paaren
+            const balanceArray = Object.entries(balance);
+
+            // Sortiere das Array nach dem Betrag in absteigender Reihenfolge
+            balanceArray.sort((a, b) => b[1] - a[1]);  // Sortiert nach dem Betrag (besserer Wert zuerst)
+
+            // Füge die sortierten Einträge der Liste hinzu
+            balanceArray.forEach(([user, amount]) => {
                 const li = document.createElement("li");
-                li.innerText = `${user}: ${formatNumber(balance[user])}`;  // Zeigt den Betrag ohne "€"
+                li.innerText = `${user}: ${formatNumber(amount)}`;
                 balanceList.appendChild(li);
-            }
+            });
         }
 
         function updateHistoryList() {
@@ -192,9 +208,7 @@
                 const parts = line.split(":");
                 if (parts.length === 2) {
                     const user = parts[0].trim();
-                    let amountString = parts[1].trim().replace('€', '').replace(',', '.'); // Ersetze Komma mit Punkt
-                    amountString = amountString.replace(/\./g, ''); // Entferne alle Punkte (Tausendertrennzeichen)
-                    const amount = parseFloat(amountString);
+                    const amount = parseFloat(parts[1].trim().replace('€', '').replace(',', '.'));
                     if (user && !isNaN(amount)) {
                         if (!balance[user]) balance[user] = 0;
                         balance[user] += amount;
@@ -206,9 +220,10 @@
         }
 
         function formatNumber(amount) {
-            return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Entfernt Dezimalstellen und fügt Tausendertrennzeichen ein
+            return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '€';  // z.B. 1.000.000€
         }
 
+        // Beim Laden der Seite Konfiguration laden
         window.onload = loadConfig;
     </script>
 </body>
