@@ -99,7 +99,7 @@
          // Funktionen zur Interaktion
          function toggleDarkMode() {
              document.body.classList.toggle("dark-mode");
-             saveConfig();  // Optional: Speichern des Dark Mode Status
+             saveConfig();
          }
  
          function toggleConfigPanel() {
@@ -126,7 +126,7 @@
              if (cmd === "/bonus" && amount !== null) {
                  if (!balance[user]) balance[user] = 0;
                  balance[user] += amount;
-                 outputMessage = `${amount}€ zu ${user} hinzugefügt. Neuer Kontostand: ${formatNumber(balance[user])}€`;
+                 outputMessage = `${amount}€ zu ${user} hinzugefügt. Neuer Kontostand: ${formatNumber(balance[user])}`;
              } else if (cmd === "/remove") {
                  if (user === "*") {
                      balance = {};
@@ -136,7 +136,7 @@
                          outputMessage = `${user} hat nicht genug Guthaben.`;
                      } else {
                          balance[user] -= amount;
-                         outputMessage = `${amount}€ von ${user} entfernt. Neuer Kontostand: ${formatNumber(balance[user])}€`;
+                         outputMessage = `${amount}€ von ${user} entfernt. Neuer Kontostand: ${formatNumber(balance[user])}`;
                      }
                  } else {
                      outputMessage = "Ungültiger Befehl! Nutze: /remove (Benutzer) (Betrag) oder /remove *";
@@ -215,7 +215,7 @@
          }
  
          function formatNumber(amount) {
-             return amount.toLocaleString('de-DE');  // Formatierung mit Tausendertrennzeichen
+             return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Entfernt Dezimalstellen und fügt Tausendertrennzeichen ein
          }
  
          // Beim Laden der Seite Konfiguration laden
