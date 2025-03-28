@@ -168,18 +168,18 @@
         // Hilfsfunktionen
         function updateBalanceList() {
             const balanceList = document.getElementById("balanceList");
-            balanceList.innerHTML = "";
+            balanceList.innerHTML = "";  // Liste leeren
 
             // Konvertiere das Balance-Objekt in ein Array von [Benutzername, Betrag]-Paaren
             const balanceArray = Object.entries(balance);
 
             // Sortiere das Array nach dem Betrag in absteigender Reihenfolge
-            balanceArray.sort((a, b) => b[1] - a[1]);  // Sortiert nach dem Betrag (besserer Wert zuerst)
+            balanceArray.sort((a, b) => b[1] - a[1]);  // Sortiert nach dem Betrag (größere Beträge zuerst)
 
             // Füge die sortierten Einträge der Liste hinzu
             balanceArray.forEach(([user, amount]) => {
                 const li = document.createElement("li");
-                li.innerText = `${user}: ${formatNumber(amount)}`;
+                li.innerText = `${user}: ${formatNumber(amount)}`;  // Formatierung des Betrags
                 balanceList.appendChild(li);
             });
         }
