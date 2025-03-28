@@ -182,7 +182,7 @@
             commandHistory.forEach(entry => {
                 const li = document.createElement("div");
                 li.classList.add("history-item");
-                li.innerText = `${entry.command} => ${entry.output}`;
+                li.innerText = `${entry.command} => ${entry.output.replace('€€', '€')}`;  // Das Euro-Zeichen nur einmal anzeigen
                 historyList.appendChild(li);
             });
         }
