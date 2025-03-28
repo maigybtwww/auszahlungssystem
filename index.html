@@ -126,7 +126,7 @@
             if (cmd === "/bonus" && amount !== null) {
                 if (!balance[user]) balance[user] = 0;
                 balance[user] += amount;
-                outputMessage = `${amount}€ zu ${user} hinzugefügt. Neuer Kontostand: ${formatNumber(balance[user])}`;
+                outputMessage = `${amount}€ zu ${user} hinzugefügt. Neuer Kontostand: ${formatNumber(balance[user])}€`;
             } else if (cmd === "/remove") {
                 if (user === "*") {
                     balance = {};
@@ -136,7 +136,7 @@
                         outputMessage = `${user} hat nicht genug Guthaben.`;
                     } else {
                         balance[user] -= amount;
-                        outputMessage = `${amount}€ von ${user} entfernt. Neuer Kontostand: ${formatNumber(balance[user])}`;
+                        outputMessage = `${amount}€ von ${user} entfernt. Neuer Kontostand: ${formatNumber(balance[user])}€`;
                     }
                 } else {
                     outputMessage = "Ungültiger Befehl! Nutze: /remove (Benutzer) (Betrag) oder /remove *";
@@ -171,7 +171,7 @@
             balanceList.innerHTML = "";
             for (const user in balance) {
                 const li = document.createElement("li");
-                li.innerText = `${user}: ${formatNumber(balance[user])}`;
+                li.innerText = `${user}: ${formatNumber(balance[user])}€`;
                 balanceList.appendChild(li);
             }
         }
@@ -182,7 +182,7 @@
             commandHistory.forEach(entry => {
                 const li = document.createElement("div");
                 li.classList.add("history-item");
-                li.innerText = `${entry.command} => ${entry.output.replace('€€', '€')}`;  // Das Euro-Zeichen nur einmal anzeigen
+                li.innerText = `${entry.command} => ${entry.output}`;
                 historyList.appendChild(li);
             });
         }
@@ -193,6 +193,7 @@
             }
         }
 
+        // Verarbeite Batch-Eingaben und formatiere sie korrekt
         function processBatchInput() {
             const batchInput = document.getElementById("batchInput").value.trim();
             const lines = batchInput.split("\n");
@@ -200,7 +201,9 @@
                 const parts = line.split(":");
                 if (parts.length === 2) {
                     const user = parts[0].trim();
-                    const amount = parseFloat(parts[1].trim().replace('€', '').replace(',', '.'));
+                    let amountString = parts[1].trim().replace('€', '').replace(',', '.'); // Ersetze Komma mit Punkt
+                    amountString = amountString.replace(/\./g, ''); // Entferne alle Punkte (Tausendertrennzeichen)
+                    const amount = parseFloat(amountString);
                     if (user && !isNaN(amount)) {
                         if (!balance[user]) balance[user] = 0;
                         balance[user] += amount;
@@ -212,8 +215,7 @@
         }
 
         function formatNumber(amount) {
-            // Formatiert den Betrag und stellt sicher, dass das Euro-Zeichen nur einmal angezeigt wird.
-            return amount.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+            return amount.toFixed(2).replace('.', ',') + '€';  // z.B. 1,00€
         }
 
         // Beim Laden der Seite Konfiguration laden
