@@ -62,6 +62,28 @@
  
          let balance = {};
          let commandHistory = [];
+
+         // Neue Funktion zum Sortieren der Kontostände
+         function sortBalancesDescending() {
+             // Konvertiere das Balance-Objekt in ein Array von Objekten
+             const balanceArray = Object.entries(balance)
+                 .map(([name, amount]) => ({ name, amount }))
+                 .sort((a, b) => b.amount - a.amount);
+
+             const balanceList = document.getElementById("balanceList");
+             balanceList.innerHTML = "";
+
+             // Zeige die sortierten Kontostände
+             balanceArray.forEach(entry => {
+                 const li = document.createElement("li");
+                 li.innerText = `${entry.name}: ${formatNumber(entry.amount)}€`;
+                 balanceList.appendChild(li);
+             });
+
+             // Zeige die Gesamtsumme aller Kontostände
+             const totalAmount = balanceArray.reduce((sum, entry) => sum + entry.amount, 0);
+             document.getElementById("totalAmount").innerText = `Gesamtbetrag: ${formatNumber(totalAmount)}€`;
+         }
  
          // Speichere Daten in Firebase
          function saveConfig() {
@@ -123,6 +145,15 @@
              let amount = parts.length === 3 ? parseFloat(parts[2].replace('€', '').trim().replace('.', '').replace(',', '.')) : null;
              let outputMessage = "";
  
+             // Neue Sortier-Funktion hinzufügen
+             if (cmd === "/sort") {
+                 sortBalancesDescending();
+                 outputMessage = "Kontostände wurden absteigend sortiert.";
+                 commandHistory.unshift({ command, output: outputMessage });
+                 document.getElementById("output").innerText = outputMessage;
+                 return;
+             }
+
              if (cmd === "/bonus" && amount !== null) {
                  if (!balance[user]) balance[user] = 0;
                  balance[user] += amount;
