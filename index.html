@@ -65,7 +65,6 @@
             margin-top: 10px;
         }
 
-        /* Neue CSS-Regeln für Linien zwischen den Kontoständen */
         #balanceList li {
             padding: 5px 0;
             border-bottom: 1px solid #ddd;
@@ -236,6 +235,11 @@
                 li.innerText = `${user}: ${formatNumber(amount)}`;
                 balanceList.appendChild(li);
             });
+
+            // Aktualisiere Gesamtsumme
+            const totalAmount = document.getElementById("totalAmount");
+            const total = Object.values(balance).reduce((sum, amount) => sum + amount, 0);
+            totalAmount.innerText = `Gesamtbetrag: ${formatNumber(total)}€`;
         }
 
         function updateHistoryList() {
@@ -264,13 +268,24 @@
                 if (parts.length === 2) {
                     const user = parts[0].trim();
                     let amountString = parts[1].trim();
-                    let amount = parseFloat(amountString.replace('€', '').replace('.', '').replace(',', '.'));
-                    if (!balance[user]) balance[user] = 0;
-                    balance[user] += amount;
+                    
+                    // Entferne Eurozeichen und Punkte
+                    amountString = amountString.replace(/[€.]/g, '').replace(',', '.');
+                    
+                    // Konvertiere zu Zahl
+                    let amount = parseFloat(amountString);
+                    
+                    // Überprüfe, ob es sich um eine gültige Zahl handelt
+                    if (!isNaN(amount)) {
+                        if (!balance[user]) balance[user] = 0;
+                        balance[user] += amount;
+                    }
                 }
             });
             saveConfig();
             updateBalanceList();
+            updateHistoryList();
+            document.getElementById("batchInput").value = ""; // Lösche Eingabefeld nach Verarbeitung
         }
 
         // Formatierfunktion für Zahlen
