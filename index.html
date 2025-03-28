@@ -96,7 +96,17 @@
             });
         }
 
-        // Rest des vorherigen Codes bleibt unverändert...
+        // Funktionen zur Interaktion
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+            saveConfig();  // Optional: Speichern des Dark Mode Status
+        }
+
+        function toggleConfigPanel() {
+            const configPanel = document.getElementById("configPanel");
+            configPanel.style.display = configPanel.style.display === "none" ? "block" : "none";
+        }
+
         function executeCommand() {
             let commandInput = document.getElementById("command");
             let command = commandInput.value.trim();
@@ -155,14 +165,55 @@
             document.getElementById("output").innerText = outputMessage;
         }
 
-        // Restliche Funktionen bleiben identisch zum vorherigen Code
-        function updateBalanceList() { /* ... */ }
-        function updateHistoryList() { /* ... */ }
-        function handleKeyPress(event) { /* ... */ }
-        function toggleDarkMode() { /* ... */ }
-        function toggleConfigPanel() { /* ... */ }
-        function processBatchInput() { /* ... */ }
-        function formatNumber(amount) { /* ... */ }
+        // Hilfsfunktionen
+        function updateBalanceList() {
+            const balanceList = document.getElementById("balanceList");
+            balanceList.innerHTML = "";
+            for (const user in balance) {
+                const li = document.createElement("li");
+                li.innerText = `${user}: ${formatNumber(balance[user])}€`;
+                balanceList.appendChild(li);
+            }
+        }
+
+        function updateHistoryList() {
+            const historyList = document.getElementById("historyList");
+            historyList.innerHTML = "";
+            commandHistory.forEach(entry => {
+                const li = document.createElement("div");
+                li.classList.add("history-item");
+                li.innerText = `${entry.command} => ${entry.output}`;
+                historyList.appendChild(li);
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                executeCommand();
+            }
+        }
+
+        function processBatchInput() {
+            const batchInput = document.getElementById("batchInput").value.trim();
+            const lines = batchInput.split("\n");
+            lines.forEach(line => {
+                const parts = line.split(":");
+                if (parts.length === 2) {
+                    const user = parts[0].trim();
+                    const amount = parseFloat(parts[1].trim().replace('€', '').replace(',', '.'));
+                    if (user && !isNaN(amount)) {
+                        if (!balance[user]) balance[user] = 0;
+                        balance[user] += amount;
+                    }
+                }
+            });
+            saveConfig();
+            updateBalanceList();
+        }
+
+        function formatNumber(amount) {
+            return amount.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+        }
 
         // Beim Laden der Seite Konfiguration laden
         window.onload = loadConfig;
